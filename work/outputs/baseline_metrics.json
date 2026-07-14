@@ -1,0 +1,5 @@
+{
+  "metric_name": "Precision@50",
+  "baseline_precision_50": 0.78,
+  "base_rate": 0.5421
+}
