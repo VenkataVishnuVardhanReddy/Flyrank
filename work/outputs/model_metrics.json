@@ -1,0 +1,6 @@
+{
+  "base_rate_p50": 0.5421211102891352,
+  "rule_baseline_p50": 0.7133333333333333,
+  "logistic_regression_p50": 0.6933333333333334,
+  "random_forest_p50": 0.7799999999999999
+}
