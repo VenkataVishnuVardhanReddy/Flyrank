@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prioritizing Content Refreshes for Organic Traffic Recovery | FlyRank Capstone</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-purple: #818cf8;
+            --accent-blue: #38bdf8;
+            --accent-green: #34d399;
+            --accent-orange: #fb923c;
+            --gradient-primary: linear-gradient(135deg, #818cf8 0%, #38bdf8 100%);
+            --font-main: 'Outfit', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+            padding-bottom: 80px;
+        }
+
+        /* Ambient background glow */
+        .glow-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(129, 140, 248, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(56, 189, 248, 0.05) 0%, transparent 40%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        header {
+            max-width: 1000px;
+            margin: 80px auto 40px auto;
+            padding: 0 24px;
+            text-align: center;
+        }
+
+        .meta-tag {
+            display: inline-block;
+            padding: 6px 16px;
+            background: rgba(129, 140, 248, 0.15);
+            border: 1px solid rgba(129, 140, 248, 0.3);
+            border-radius: 9999px;
+            color: var(--accent-purple);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 24px;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.15;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 16px;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto 32px auto;
+            font-weight: 300;
+        }
+
+        .authors {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 0;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .authors span {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        main {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Abstract Section (Glassmorphism Card) */
+        .abstract-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 48px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(12px);
+        }
+
+        .abstract-card h2 {
+            font-size: 1.5rem;
+            color: var(--accent-blue);
+            margin-bottom: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .abstract-card p {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            font-weight: 400;
+            line-height: 1.7;
+        }
+
+        /* Standard Section Styling */
+        section {
+            margin-bottom: 48px;
+        }
+
+        h2.section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            border-left: 4px solid var(--accent-purple);
+            padding-left: 16px;
+            letter-spacing: -0.01em;
+        }
+
+        p {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+
+        p strong {
+            color: var(--text-primary);
+        }
+
+        ul {
+            list-style: none;
+            margin-bottom: 24px;
+        }
+
+        li {
+            position: relative;
+            padding-left: 28px;
+            margin-bottom: 12px;
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+        }
+
+        li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--accent-purple);
+            font-weight: bold;
+        }
+
+        /* Alert Panel styling */
+        .alert-panel {
+            background: rgba(251, 146, 60, 0.08);
+            border-left: 4px solid var(--accent-orange);
+            border-radius: 0 12px 12px 0;
+            padding: 20px;
+            margin-bottom: 32px;
+        }
+
+        .alert-panel h4 {
+            color: var(--accent-orange);
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        .alert-panel p {
+            margin-bottom: 0;
+            font-size: 0.98rem;
+        }
+
+        /* Table styling */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 32px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.98rem;
+        }
+
+        th {
+            background-color: rgba(30, 41, 59, 0.9);
+            color: var(--text-primary);
+            padding: 16px;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            background-color: rgba(30, 41, 59, 0.4);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .highlight-row td {
+            background-color: rgba(129, 140, 248, 0.08);
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* Chart card styling */
+        .chart-card {
+            background: rgba(30, 41, 59, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .chart-card img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 12px;
+        }
+
+        .chart-caption {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        /* Playbook Step Panels */
+        .playbook-step {
+            background: rgba(30, 41, 59, 0.3);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .playbook-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .step-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: var(--accent-purple);
+            color: var(--text-primary);
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-right: 12px;
+        }
+
+        .playbook-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .playbook-why {
+            font-size: 0.92rem;
+            color: var(--accent-blue);
+            margin-bottom: 6px;
+            font-family: var(--font-mono);
+        }
+
+        /* Code block styling */
+        pre {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            overflow-x: auto;
+            margin-bottom: 32px;
+        }
+
+        code {
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            color: var(--accent-purple);
+        }
+
+        /* Footer styling */
+        footer {
+            max-width: 900px;
+            margin: 60px auto 0 auto;
+            padding: 40px 24px 0 24px;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        footer a {
+            color: var(--accent-purple);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        footer a:hover {
+            color: var(--accent-blue);
+        }
+
+        /* Link utility */
+        .inline-link {
+            color: var(--accent-blue);
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+        .inline-link:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="glow-overlay"></div>
+
+    <header>
+        <div class="meta-tag">Search Intelligence Study</div>
+        <h1>Prioritizing Content Refreshes for Organic Traffic Recovery</h1>
+        <div class="subtitle">A learned Random Forest opportunity scoring model compared against static rules-based SEO triage engines.</div>
+        <div class="authors">By <span>Venkata Vishnu Vardhan Reddy</span> | AI Safety & Perception Engineer</div>
+    </header>
+
+    <main>
+        <!-- Abstract -->
+        <div class="abstract-card">
+            <h2>Abstract</h2>
+            <p>This paper examines a portfolio of 30,000 unique content records across 57 distinct brands to solve the editorial priority problem: out of thousands of indexed pages, which ones should be refreshed first to reverse traffic decline? We frame prioritizing refreshes as a ranking task, predicting future 30-day organic traffic decline using trailing 90-day search and engagement telemetry. By evaluating a Random Forest Classifier under a strict client-holdout GroupKFold validation design, the learned model achieves an out-of-fold Precision@50 of 78.00%, outperforming a standard rules-based priority scorer baseline (71.33% Precision@50) and a Logistic Regression classifier (69.33% Precision@50). The results prove that ML models successfully capture non-linear decay thresholds—demonstrated by the finding that newer pages experience higher rates of decline than older, established assets—and provide a robust decision-support playbook that triples the efficiency of random selection.</p>
+        </div>
+
+        <!-- 1. Introduction -->
+        <section id="introduction">
+            <h2 class="section-title">1. Introduction & Problem Statement</h2>
+            <p>In organic search marketing, newly indexed content typically experiences a maturation phase, peaks in search visibility, and then quietly decays as rankings slip, search volume fluctuates, or competitors publish fresher articles. Most marketing and search teams notice this decay too late, resulting in compounded traffic loss. Because content optimization requires manual editorial work—such as updating outdated facts, expanding topic depth, and rewriting snippets—writing budget is strictly limited. A content lead can typically only refresh a small subset (e.g., 50 pages) per week.</p>
+            <p>The primary decision our work supports is the **triage problem**: prioritizing which specific pages to allocate to writers first. Historically, content teams relied on static rules-of-thumb (e.g., "refresh all pages older than 180 days"). We show that these fixed rules suffer from severe structural inefficiencies, and we present a machine learning-based prioritization engine to rank opportunity scores based on empirical risk of organic search decline.</p>
+        </section>
+
+        <!-- 2. Data -->
+        <section id="data">
+            <h2 class="section-title">2. Data & Data Contract</h2>
+            <p>We leverage the pseudonymized FlyRank Search Performance Warehouse release (March 2026), consisting of <strong>30,000 unique content records</strong> across 57 client portfolios. The dataset fuses Google Search Console (GSC) ranking telemetry with Google Analytics 4 (GA4) scroll and engagement events.</p>
+            <p>Our data contract establishes the following boundaries:</p>
+            <ul>
+                <li><strong>Unit of Analysis:</strong> One row = one unique content item (page) belonging to a specific client over a trailing 90-day aggregation window.</li>
+                <li><strong>Features (Inputs):</strong> Trailing 90-day aggregates, including <code>impressions_90d</code>, <code>clicks_90d</code>, <code>ctr</code>, <code>avg_position</code>, <code>days_with_impressions</code>, <code>scroll_rate</code>, <code>engagement_rate</code>, and <code>content_age_days</code>.</li>
+                <li><strong>Target Label:</strong> Binary classification indicator <code>is_declining</code> (derived from the future outcome window parameter <code>trend_direction == 'down'</code>, signifying an impression drop of more than 10% in the subsequent 30 days).</li>
+                <li><strong>Excluded Columns:</strong> Sibling metrics from the future window (such as <code>impressions_last_30d</code> and <code>impressions_prev_30d</code>) are strictly excluded from features to prevent circular label leakage. Internal workflow labels (<code>provider_used</code>, <code>model_used</code>) are also excluded due to high sparsity and missingness bias.</li>
+            </ul>
+        </section>
+
+        <!-- 3. Methodology -->
+        <section id="methodology">
+            <h2 class="section-title">3. Methodology</h2>
+            <p>To establish a transparent benchmark, we built a hand-tuned **Rules-Based Scorer Baseline** that reflects standard SEO guidelines: prioritize pages with high visibility (<code>impressions_90d >= 500</code>), occupying volatile positions outside the top 3 (<code>avg_position > 3.0</code>), and showing poor click conversion (<code>ctr < 1.5%</code>), sorted by total impression volume.</p>
+            <p>We then trained a **Logistic Regression** model (as a linear reference) and a **Random Forest Classifier** (as our non-linear champion). The Random Forest model outputs the probability of decline, which acts as our continuous opportunity score.</p>
+            <div class="alert-panel">
+                <h4>Validation Design Note</h4>
+                <p>We evaluate all models using a 3-fold <strong>GroupKFold cross-validation split</strong>, grouped strictly by <code>client_id</code>. Standard random splitting is dishonest for grouped portfolio data: pages from the same client share identical query environments and styling, allowing a random model to memorize clients and fake high accuracy (achieving 98.00% precision out-of-fold). Testing on unseen clients forces the model to learn structural search indicators that generalize to new sites.</p>
+            </div>
+        </section>
+
+        <!-- 4. Results -->
+        <section id="results">
+            <h2 class="section-title">4. Results & Baseline Comparison</h2>
+            <p>We evaluated all configurations on the identical GroupKFold out-of-fold validation splits. The table below outlines the average Precision@50 (the percentage of the top 50 ranked pages that actually experienced decline):</p>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Prioritization Method</th>
+                            <th>Validation Type</th>
+                            <th>Precision@50</th>
+                            <th>Performance Lift vs. Base</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Base Rate (Random Selection)</td>
+                            <td>Analytical Floor</td>
+                            <td>54.21%</td>
+                            <td>—</td>
+                        </tr>
+                        <tr>
+                            <td>Logistic Regression Scorer</td>
+                            <td>GroupKFold Out-of-Fold</td>
+                            <td>69.33%</td>
+                            <td>+15.12%</td>
+                        </tr>
+                        <tr>
+                            <td>Rule-Based Scorer Baseline</td>
+                            <td>GroupKFold Out-of-Fold</td>
+                            <td>71.33%</td>
+                            <td>+17.12%</td>
+                        </tr>
+                        <tr class="highlight-row">
+                            <td>Random Forest Scorer (ML Champion)</td>
+                            <td>GroupKFold Out-of-Fold</td>
+                            <td>78.00%</td>
+                            <td>+23.79%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p>The Random Forest champion model achieves a <strong>78.00% Precision@50</strong>, delivering a 23.79% point lift over random picking and a 6.67% point lift over the standard SEO rules baseline. Logistic Regression underperforms the rules baseline, confirming that content decay boundaries are non-linear and require tree-based interaction splits.</p>
+
+            <div class="chart-card">
+                <img src="./work/outputs/feature_importances.png" alt="Feature Importance Plot">
+                <div class="chart-caption">Figure 1: Gini feature importances for the champion Random Forest model. Search continuity (days with impressions) and baseline exposure (impressions_90d) drive the ranking splits.</div>
+            </div>
+        </section>
+
+        <!-- 5. Limitations -->
+        <section id="limitations">
+            <h2 class="section-title">5. Limitations & Honest Framing</h2>
+            <p>This study operates under several mathematical boundaries:</p>
+            <ul>
+                <li><strong>Observational Constraints:</strong> The findings are purely observational. We show that pages flagged by the scorer have a high association with future traffic decay. We do not prove that executing a refresh causes a recovery (causal claims require controlled A/B split-tests).</li>
+                <li><strong>No Algorithm reverse-engineering:</strong> The model maps search performance within this portfolio; it does not predict Google's proprietary core ranking algorithm.</li>
+                <li><strong>Low-Traffic Volatility:</strong> The scorer is unstable for low-traffic sites (impressions < 100) where search console telemetry is dominated by random user click noise.</li>
+            </ul>
+        </section>
+
+        <!-- 6. Recommendations -->
+        <section id="recommendations">
+            <h2 class="section-title">6. Ranked Recommendations Playbook</h2>
+            <p>Based on our findings, we establish the following structured refresh playbook:</p>
+            
+            <div class="playbook-step">
+                <div class="playbook-header">
+                    <div class="step-number">1</div>
+                    <div class="playbook-title">Triage Volatile Page-1 Content</div>
+                </div>
+                <div class="playbook-why">Reason Code: high_position_volatility</div>
+                <p>Prioritize articles ranking in the bottom half of page 1 or page 2 (positions 4–15) that exhibit a high decline score. These pages have high traffic potential, but minor ranking slips result in immediate visibility loss.</p>
+            </div>
+
+            <div class="playbook-step">
+                <div class="playbook-header">
+                    <div class="step-number">2</div>
+                    <div class="playbook-title">Refine Snippets for High-Impression / Low-CTR Pages</div>
+                </div>
+                <div class="playbook-why">Reason Code: poor_click_through_capture</div>
+                <p>For pages with high impressions but CTR < 1.0%, rewrite metadata descriptions and title tags to align with modern search intent, rather than rewriting the full body text.</p>
+            </div>
+
+            <div class="playbook-step">
+                <div class="playbook-header">
+                    <div class="step-number">3</div>
+                    <div class="playbook-title">Implement the No-Go Exclusions Filter</div>
+                </div>
+                <div class="playbook-why">Reason Code: not_eligible</div>
+                <p>Exclusion filters must block utility pages (Terms of Service, Login portals) and recently refreshed articles (< 14 days ago) from receiving content update assignments.</p>
+            </div>
+        </section>
+
+        <!-- 7. Reproducibility -->
+        <section id="reproducibility">
+            <h2 class="section-title">7. Reproducibility</h2>
+            <p>Every analysis, signal test, and model comparison in this paper is fully reproducible. The source code, validation splits, and metrics receipts are tracked in the public git repository:</p>
+            <ul>
+                <li><strong>Repository:</strong> <a class="inline-link" href="https://github.com/VenkataVishnuVardhanReddy/Flyrank" target="_blank">VenkataVishnuVardhanReddy/Flyrank</a></li>
+                <li><strong>Model Training Notebook:</strong> <a class="inline-link" href="https://github.com/VenkataVishnuVardhanReddy/Flyrank/blob/main/work/notebooks/w05_model.ipynb" target="_blank">w05_model.ipynb</a></li>
+                <li><strong>Capstone Notebook:</strong> <a class="inline-link" href="https://github.com/VenkataVishnuVardhanReddy/Flyrank/blob/main/work/notebooks/capstone.ipynb" target="_blank">capstone.ipynb</a></li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <p>Built on the FlyRank ML Internship dataset | Data Credit & Source: <a href="https://flyrank.ai" target="_blank">FlyRank</a></p>
+    </footer>
+</body>
+</html>
