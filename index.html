@@ -366,6 +366,62 @@
         .inline-link:hover {
             opacity: 0.8;
         }
+
+        /* Contact Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-size: 0.92rem;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            font-size: 0.95rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.25);
+        }
+
+        .btn-submit {
+            display: inline-block;
+            width: 100%;
+            padding: 14px 24px;
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+            text-align: center;
+        }
+
+        .btn-submit:hover {
+            opacity: 0.9;
+        }
+
+        .btn-submit:active {
+            transform: scale(0.98);
+        }
     </style>
 </head>
 <body>
@@ -521,6 +577,30 @@
                 <li><strong>Model Training Notebook:</strong> <a class="inline-link" href="https://github.com/VenkataVishnuVardhanReddy/Flyrank/blob/main/work/notebooks/w05_model.ipynb" target="_blank">w05_model.ipynb</a></li>
                 <li><strong>Capstone Notebook:</strong> <a class="inline-link" href="https://github.com/VenkataVishnuVardhanReddy/Flyrank/blob/main/work/notebooks/capstone.ipynb" target="_blank">capstone.ipynb</a></li>
             </ul>
+        </section>
+
+        <!-- 8. Book a Technical Demo -->
+        <section id="contact">
+            <h2 class="section-title">8. Book a Technical Demo</h2>
+            <p>Schedule a 15-minute verification audit or request a custom validation console for your ML perception models. Submissions are processed securely via Formspree.</p>
+            
+            <div class="abstract-card" style="max-width: 600px; margin: 0 auto;">
+                <form action="https://formspree.io/f/xvonzgwb" method="POST">
+                    <div class="form-group">
+                        <label for="name">Your Name</label>
+                        <input type="text" name="name" id="name" class="form-control" placeholder="Jane Doe" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Work Email</label>
+                        <input type="email" name="email" id="email" class="form-control" placeholder="jane@company.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Console Specifications / Requirements</label>
+                        <textarea name="message" id="message" rows="4" class="form-control" placeholder="Describe your CV model architecture or data contract requirements..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn-submit">Submit Request</button>
+                </form>
+            </div>
         </section>
     </main>
 
