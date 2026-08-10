@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prioritizing Content Refreshes for Organic Traffic Recovery | FlyRank Capstone</title>
+    <meta name="description" content="A data-driven machine learning research paper scoring page-level content decay and organic search traffic decline across 30,000 unique records.">
+    <meta property="og:title" content="Prioritizing Content Refreshes for Organic Traffic Recovery">
+    <meta property="og:description" content="A research paper and validation console prioritizing content decay on 57 distinct brand portfolios under GroupKFold client validation.">
+    <meta property="og:url" content="https://venkatavishnuvardhanreddy.github.io/Flyrank/">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://venkatavishnuvardhanreddy.github.io/Flyrank/work/outputs/feature_importances.png">
+    <meta name="twitter:card" content="summary_large_image">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -607,5 +614,15 @@
     <footer>
         <p>Built on the FlyRank ML Internship dataset | Data Credit & Source: <a href="https://flyrank.ai" target="_blank">FlyRank</a></p>
     </footer>
+    <script>
+        const form = document.querySelector('form');
+        const submitBtn = document.querySelector('.btn-submit');
+        if (form && submitBtn) {
+            form.addEventListener('submit', () => {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Submitting Request...';
+            });
+        }
+    </script>
 </body>
 </html>
