@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, List
+import sqlite3
 
 app = FastAPI(
     title="Task API",
@@ -8,77 +9,70 @@ app = FastAPI(
     version="1.0"
 )
 
+DB_FILE = "tasks.db"
+
+def get_db_connection():
+    conn = sqlite3.connect(DB_FILE)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+def init_db():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS tasks (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            done BOOLEAN NOT NULL CHECK (done IN (0, 1))
+        )
+    ''')
+    cursor.execute('SELECT COUNT(*) FROM tasks')
+    if cursor.fetchone()[0] == 0:
+        cursor.executemany("INSERT INTO tasks (title, done) VALUES (?, ?)", [
+            ("Buy groceries", 0),
+            ("Read documentation", 1),
+            ("Write code", 0)
+        ])
+    conn.commit()
+    conn.close()
+
+@app.on_event("startup")
+def startup_event():
+    init_db()
+
 class Task(BaseModel):
     id: int
     title: str
     done: bool
 
 class TaskCreate(BaseModel):
-    title: str = Field(..., min_length=1, description="The title of the task")
+    title: str = Field(..., min_length=1)
 
 class TaskUpdate(BaseModel):
     title: Optional[str] = Field(None, min_length=1)
     done: Optional[bool] = None
 
-tasks = [
-    Task(id=1, title="Buy groceries", done=False),
-    Task(id=2, title="Read documentation", done=True),
-    Task(id=3, title="Write code", done=False)
-]
+# Old in-memory array kept around for now
+tasks = []
 
-def get_next_id():
-    if not tasks:
-        return 1
-    return max(task.id for task in tasks) + 1
-
-@app.get("/", summary="Root Endpoint")
+@app.get("/")
 def read_root():
-    """Returns basic information about the API."""
     return {"name": "Task API", "version": "1.0", "endpoints": ["/tasks"]}
-
-@app.get("/health", summary="Health Check")
+@app.get("/health")
 def read_health():
-    """Returns the health status of the API."""
     return {"status": "ok"}
-
-@app.get("/tasks", summary="List Tasks")
+@app.get("/tasks")
 def get_tasks():
-    """Returns a list of all tasks."""
     return tasks
-
-@app.get("/tasks/{task_id}", summary="Get Task")
+@app.get("/tasks/{task_id}")
 def get_task(task_id: int):
-    """Returns a single task by ID."""
-    for task in tasks:
-        if task.id == task_id:
-            return task
-    raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
-
-@app.post("/tasks", status_code=status.HTTP_201_CREATED, summary="Create Task")
+    raise HTTPException(status_code=404, detail="Task not found")
+@app.post("/tasks", status_code=status.HTTP_201_CREATED)
 def create_task(task_in: TaskCreate):
-    """Creates a new task."""
-    new_task = Task(id=get_next_id(), title=task_in.title, done=False)
-    tasks.append(new_task)
-    return new_task
-
-@app.put("/tasks/{task_id}", summary="Update Task")
+    return {}
+@app.put("/tasks/{task_id}")
 def update_task(task_id: int, task_update: TaskUpdate):
-    """Updates an existing task."""
-    for i, task in enumerate(tasks):
-        if task.id == task_id:
-            if task_update.title is not None:
-                task.title = task_update.title
-            if task_update.done is not None:
-                task.done = task_update.done
-            tasks[i] = task
-            return task
-    raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
-
-@app.delete("/tasks/{task_id}", status_code=status.HTTP_204_NO_CONTENT, summary="Delete Task")
+    raise HTTPException(status_code=404, detail="Task not found")
+@app.delete("/tasks/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_task(task_id: int):
-    """Deletes an existing task."""
-    for i, task in enumerate(tasks):
-        if task.id == task_id:
-            del tasks[i]
-            return
-    raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
+    raise HTTPException(status_code=404, detail="Task not found")
