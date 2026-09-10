@@ -1,47 +1,44 @@
-# Task API - SQLite Version
+# Task API - Containerized with Docker & PostgreSQL
 
 A simple CRUD API for managing a to-do list, built with FastAPI.
-This version replaces the in-memory array with a real **SQLite database**.
+This version replaces the SQLite database with a real **PostgreSQL database** running inside a **Docker container**.
 
-## Why SQLite?
-SQLite is a lightweight database that stores everything in a single file (`tasks.db`). 
-It requires zero server setup, has no external dependencies, and perfectly demonstrates how data persists (survives restarts) without added complexity. 
+## Why PostgreSQL and Docker?
+Using Docker removes "works on my machine" issues. The PostgreSQL database is run in a throwaway container that behaves identically everywhere, and a mounted volume ensures data persistence across restarts. We use a `.env` file to keep secrets out of Git.
 
 ## Installation & Running
 
-1. Install dependencies:
+1. Clone the repository and navigate to this directory.
+2. Copy the example environment variables:
    ```bash
-   pip install -r requirements.txt
+   cp .env.example .env
+   ```
+3. Run the entire stack (API + Database) with one command:
+   ```bash
+   docker compose up
    ```
 
-2. Run the server:
-   ```bash
-   uvicorn main:app --reload
-   ```
-
-The server will start on `http://localhost:8000`. The `tasks.db` database is created automatically upon startup.
+The API server will start on `http://localhost:3000`.
 
 ## Endpoints
 
 | Method | Path | Description |
 |---|---|---|
 | GET | `/` | API description |
-| GET | `/health` | Health check |
+| GET | `/health` | Health check (verifies DB connection) |
 | GET | `/tasks` | List all tasks |
 | GET | `/tasks/{id}` | Get a specific task by ID |
 | POST | `/tasks` | Create a new task |
 | PUT | `/tasks/{id}` | Update a task |
 | DELETE | `/tasks/{id}` | Delete a task |
 
-## Example SQL Query (Stage 4)
+## Example Request
 
-I manually opened `tasks.db` in DB Browser for SQLite and ran:
-```sql
-SELECT * FROM tasks WHERE done = 1;
+```bash
+curl -i http://localhost:3000/tasks/1
 ```
-It returned only the completed tasks, exactly as expected.
 
 ## Interactive Documentation
 
 FastAPI provides an automatic, interactive Swagger UI documentation page.
-After starting the server, visit: **[http://localhost:8000/docs](http://localhost:8000/docs)**
+After starting the stack, visit: **[http://localhost:3000/docs](http://localhost:3000/docs)**
