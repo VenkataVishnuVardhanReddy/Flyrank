@@ -39,3 +39,15 @@ def login(auth_details: AuthDetails):
         return res.session
     except Exception as e:
         raise HTTPException(status_code=401, detail='{"error": "Invalid login credentials"}')
+
+from fastapi import Header
+
+@app.get("/public/info", status_code=status.HTTP_200_OK)
+def public_info():
+    return {"message": "Welcome stranger! This info is public."}
+
+@app.get("/protected/profile", status_code=status.HTTP_200_OK)
+def protected_profile(authorization: str = Header(None)):
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail='{"error": "Access token required"}')
+    return {"message": "Welcome to your profile!"}
