@@ -52,21 +52,31 @@ class TaskUpdate(BaseModel):
     title: Optional[str] = Field(None, min_length=1)
     done: Optional[bool] = None
 
-# Old in-memory array kept around for now
-tasks = []
-
 @app.get("/")
 def read_root():
     return {"name": "Task API", "version": "1.0", "endpoints": ["/tasks"]}
 @app.get("/health")
 def read_health():
     return {"status": "ok"}
-@app.get("/tasks")
+@app.get("/tasks", response_model=List[Task])
 def get_tasks():
-    return tasks
-@app.get("/tasks/{task_id}")
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM tasks')
+    rows = cursor.fetchall()
+    conn.close()
+    return [{"id": row["id"], "title": row["title"], "done": bool(row["done"])} for row in rows]
+
+@app.get("/tasks/{task_id}", response_model=Task)
 def get_task(task_id: int):
-    raise HTTPException(status_code=404, detail="Task not found")
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM tasks WHERE id = ?', (task_id,))
+    row = cursor.fetchone()
+    conn.close()
+    if row is None:
+        raise HTTPException(status_code=404, detail='{"error": "Task not found"}')
+    return {"id": row["id"], "title": row["title"], "done": bool(row["done"])}
 @app.post("/tasks", status_code=status.HTTP_201_CREATED)
 def create_task(task_in: TaskCreate):
     return {}
