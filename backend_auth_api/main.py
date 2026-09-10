@@ -1,4 +1,5 @@
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, HTTPException, status, Depends
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
 import os
 from dotenv import load_dotenv
@@ -6,7 +7,11 @@ from supabase import create_client, Client
 
 load_dotenv()
 
-app = FastAPI()
+app = FastAPI(
+    title="Auth API",
+    description="A secure API demonstrating authentication using Supabase.",
+    version="1.0"
+)
 
 url: str = os.environ.get("SUPABASE_URL", "")
 key: str = os.environ.get("SUPABASE_KEY", "")
@@ -40,22 +45,35 @@ def login(auth_details: AuthDetails):
     except Exception as e:
         raise HTTPException(status_code=401, detail='{"error": "Invalid login credentials"}')
 
-from fastapi import Header
+security = HTTPBearer()
+
+def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    token = credentials.credentials
+    try:
+        user = supabase.auth.get_user(token)
+        if not user:
+             raise HTTPException(status_code=401, detail='{"error": "Invalid or expired token"}')
+        return user
+    except Exception as e:
+        raise HTTPException(status_code=401, detail='{"error": "Invalid or expired token"}')
+
+@app.post("/auth/logout", status_code=status.HTTP_204_NO_CONTENT)
+def logout(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    # Supabase JWTs are stateless but we can try to call sign_out
+    try:
+        supabase.auth.sign_out()
+    except Exception:
+        pass
+    return
 
 @app.get("/public/info", status_code=status.HTTP_200_OK)
 def public_info():
     return {"message": "Welcome stranger! This info is public."}
 
 @app.get("/protected/profile", status_code=status.HTTP_200_OK)
-def protected_profile(authorization: str = Header(None)):
-    if not authorization or not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail='{"error": "Access token required"}')
-    
-    token = authorization.split(" ")[1]
-    try:
-        user = supabase.auth.get_user(token)
-        if not user:
-            raise HTTPException(status_code=401, detail='{"error": "Invalid or expired token"}')
-        return {"message": "Welcome to your profile!", "user": user}
-    except Exception as e:
-        raise HTTPException(status_code=401, detail='{"error": "Invalid or expired token"}')
+def protected_profile(user = Depends(get_current_user)):
+    return {"message": "Welcome to your profile!", "user": user}
+
+@app.get("/protected/dashboard", status_code=status.HTTP_200_OK)
+def protected_dashboard(user = Depends(get_current_user)):
+    return {"message": "Dashboard access granted.", "user": user}
