@@ -86,9 +86,31 @@ def create_task(task_in: TaskCreate):
     task_id = cursor.lastrowid
     conn.close()
     return {"id": task_id, "title": task_in.title, "done": False}
-@app.put("/tasks/{task_id}")
+@app.put("/tasks/{task_id}", response_model=Task)
 def update_task(task_id: int, task_update: TaskUpdate):
-    raise HTTPException(status_code=404, detail="Task not found")
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM tasks WHERE id = ?', (task_id,))
+    row = cursor.fetchone()
+    if row is None:
+        conn.close()
+        raise HTTPException(status_code=404, detail='{"error": "Task not found"}')
+    new_title = task_update.title if task_update.title is not None else row["title"]
+    new_done = task_update.done if task_update.done is not None else bool(row["done"])
+    cursor.execute('UPDATE tasks SET title = ?, done = ? WHERE id = ?', (new_title, int(new_done), task_id))
+    conn.commit()
+    conn.close()
+    return {"id": task_id, "title": new_title, "done": new_done}
+
 @app.delete("/tasks/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_task(task_id: int):
-    raise HTTPException(status_code=404, detail="Task not found")
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM tasks WHERE id = ?', (task_id,))
+    if cursor.fetchone() is None:
+        conn.close()
+        raise HTTPException(status_code=404, detail='{"error": "Task not found"}')
+    cursor.execute('DELETE FROM tasks WHERE id = ?', (task_id,))
+    conn.commit()
+    conn.close()
+    return
