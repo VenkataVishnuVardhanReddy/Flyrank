@@ -77,9 +77,15 @@ def get_task(task_id: int):
     if row is None:
         raise HTTPException(status_code=404, detail='{"error": "Task not found"}')
     return {"id": row["id"], "title": row["title"], "done": bool(row["done"])}
-@app.post("/tasks", status_code=status.HTTP_201_CREATED)
+@app.post("/tasks", status_code=status.HTTP_201_CREATED, response_model=Task)
 def create_task(task_in: TaskCreate):
-    return {}
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('INSERT INTO tasks (title, done) VALUES (?, ?)', (task_in.title, 0))
+    conn.commit()
+    task_id = cursor.lastrowid
+    conn.close()
+    return {"id": task_id, "title": task_in.title, "done": False}
 @app.put("/tasks/{task_id}")
 def update_task(task_id: int, task_update: TaskUpdate):
     raise HTTPException(status_code=404, detail="Task not found")
